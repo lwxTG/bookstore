@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lwx.mapper.RechargeRecordMapper">
+
+    <resultMap id="RechargeRecordType" type="com.lwx.vo.RechargeRecordVO">
+        <id property="id" column="id"></id>
+        <result property="userId" column="user_id"></result>
+        <result property="rechargeType" column="recharge_type"></result>
+        <result property="rechargeAmount" column="recharge_amount"></result>
+        <result property="rechargeTime" column="recharge_time"></result>
+
+        <!--一对一的关系映射，配置封装user的内容-->
+        <association property="user" javaType="com.lwx.entity.User">
+            <id property="id" column="id"></id>
+        </association>
+    </resultMap>
+
+    <select id="findAllRechargeRecordsInfo" resultMap="RechargeRecordType">
+        select *
+        from tbl_recharge_record r
+        left join tbl_user u on u.id = r.user_id
+        <!--带条件的高级查询-->
+        <where>
+            <if test="user!=null">
+                <!--根据用户名查询-->
+                <if test="user.username!=null and user.username!=''">
+                    and u.username like '%${user.username}%'
+                </if>
+            </if>
+            <if test="rechargeTime!=null">
+                and to_days(r.recharge_time) - to_days(#{rechargeTime}) = 0
+            </if>
+            <if test="rechargeType!=null">
+                and r.recharge_type=#{rechargeType}
+            </if>
+        </where>
+        order by r.id desc
+    </select>
+
+    <!--查询充值历史-->
+    <select id="findRechargeRecordsByUserId" resultMap="RechargeRecordType">
+        SELECT *
+        from tbl_recharge_record r
+        left join tbl_user u on u.id = r.user_id
+        <where>
+            <if test="userId!=null">and u.id=#{userId} </if>
+        </where>
+        order by r.id desc
+    </select>
+
+</mapper>

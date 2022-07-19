@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lwx.mapper.BookMapper">
+
+    <resultMap id="BookAndType" type="com.lwx.vo.BookVO">
+        <id property="id" column="id"></id>
+        <result property="bookName" column="book_name"></result>
+        <result property="author" column="author"></result>
+        <result property="isbn" column="isbn"></result>
+        <result property="publish" column="publish"></result>
+        <result property="typeId" column="type_id"></result>
+        <result property="introduction" column="introduction"></result>
+        <result property="price" column="price"></result>
+        <result property="amount" column="amount"></result>
+        <result property="shelfTime" column="shelf_time"></result>
+        <result property="updateTime" column="update_time"></result>
+
+        <!--一对一的关系映射，配置封装user的内容-->
+        <association property="bookType" javaType="com.lwx.entity.BookType">
+            <id property="id" column="id"></id>
+            <result property="bookType" column="book_type"></result>
+            <result property="description" column="description"></result>
+        </association>
+    </resultMap>
+
+    <select id="findAllBookInfo" resultMap="BookAndType">
+        SELECT * FROM tbl_book b, tbl_book_type t WHERE b.type_id=t.id
+        <if test="bookName!=null">
+            and b.book_name like '%${bookName}%'
+        </if>
+        <if test="isbn!=null">
+            and b.isbn like '%${isbn}%'
+        </if>
+        <if test="typeId!=null">
+            and b.type_id=#{typeId}
+        </if>
+    </select>
+
+    <select id="getBookCountByType" resultType="java.util.HashMap">
+        select t.book_type as type, sum(b.amount) as count
+        from tbl_book b
+            left join tbl_book_type t
+        on t.id = b.type_id
+        group by b.type_id
+    </select>
+
+    <select id="getBookDonateAmount" resultType="java.util.HashMap">
+        select b.book_name as bookName, sum(d.donate_amount) as donateAmount
+        from tbl_book b
+                 left join tbl_donate_record d on d.book_id = b.id
+        where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <![CDATA[ <= ]]> date (d.donate_time)
+        group by d.book_id
+        order by donateAmount desc
+            limit 10
+    </select>
+
+    <select id="getBookPurchaseAmount" resultType="java.util.HashMap">
+        select b.book_name as bookName, sum(p.purchase_amount) as purchaseAmount
+        from tbl_book b
+                 left join tbl_purchase_record p on p.book_id = b.id
+        where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <![CDATA[ <= ]]> date (p.purchase_time)
+        group by p.book_id
+        order by purchaseAmount desc
+            limit 10
+    </select>
+
+    <select id="getBookLendTimes" resultType="java.util.HashMap">
+        select b.book_name as bookName, count(l.book_id) as lendTimes
+        from tbl_book b
+                 left join tbl_lend_record l on l.book_id = b.id
+        where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <![CDATA[ <= ]]> date (l.lend_time)
+        group by l.book_id
+        order by lendTimes desc
+            limit 10
+    </select>
+
+</mapper>

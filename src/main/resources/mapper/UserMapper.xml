@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lwx.mapper.UserMapper">
+
+    <select id="findAllUserInfo" resultType="com.lwx.entity.User">
+        SELECT * FROM tbl_user
+        <where>
+            <if test="username!=null">
+                and tbl_user.username like '%${username}%'
+            </if>
+            <if test="realName!=null">
+                and tbl_user.real_name like '%${realName}%'
+            </if>
+            <if test="telephone!=null">
+                and tbl_user.telephone like '%${telephone}%'
+            </if>
+            <if test="userRole!=null">
+                and tbl_user.user_role like '%${userRole}%'
+            </if>
+        </where>
+    </select>
+
+    <select id="getUserDonateAmount" resultType="java.util.HashMap">
+        select u.real_name as realName, sum(d.donate_amount) as donateAmount
+        from tbl_user u
+                 left join tbl_donate_record d on d.user_id = u.id
+        where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <![CDATA[ <= ]]> date (d.donate_time)
+        group by d.user_id
+        order by donateAmount desc
+            limit 10
+    </select>
+
+    <select id="getUserPurchaseAmount" resultType="java.util.HashMap">
+        select u.real_name as realName, sum(p.purchase_amount) as purchaseAmount
+        from tbl_user u
+                 left join tbl_purchase_record p on p.user_id = u.id
+        where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <![CDATA[ <= ]]> date (p.purchase_time)
+        group by p.user_id
+        order by purchaseAmount desc
+            limit 10
+    </select>
+
+    <select id="getUserLendTimes" resultType="java.util.HashMap">
+        select u.real_name as realName, count(l.book_id) as lendTimes
+        from tbl_user u
+                 left join tbl_lend_record l on l.user_id = u.id
+        where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <![CDATA[ <= ]]> date (l.lend_time)
+        group by l.user_id
+        order by lendTimes desc
+            limit 10
+    </select>
+
+</mapper>

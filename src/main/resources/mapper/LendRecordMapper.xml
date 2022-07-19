@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lwx.mapper.LendRecordMapper">
+
+    <resultMap id="LendRecordType" type="com.lwx.vo.LendRecordVO">
+        <id property="id" column="id"></id>
+        <result property="bookId" column="book_id"></result>
+        <result property="userId" column="user_id"></result>
+        <result property="lendTime" column="lend_time"></result>
+        <result property="backTime" column="back_time"></result>
+        <result property="backType" column="back_type"></result>
+
+        <association property="book" javaType="com.lwx.entity.Book">
+            <id property="id" column="id"></id>
+            <result property="bookName" column="book_name"></result>
+        </association>
+        <association property="user" javaType="com.lwx.entity.User">
+            <id property="id" column="id"></id>
+            <result property="username" column="username"></result>
+            <result property="realName" column="real_name"></result>
+        </association>
+    </resultMap>
+
+    <select id="findAllLendRecordsInfo" resultMap="LendRecordType">
+        select *
+        from tbl_lend_record lend
+        left join tbl_book b on b.id = lend.book_id
+        left join tbl_user u on u.id = lend.user_id
+        <!--带条件的高级查询-->
+        <where>
+            <if test="book!=null">
+                <!--根据图书名称查询-->
+                <if test="book.bookName!=null and book.bookName!=''">
+                    and b.book_name like '%${book.bookName}%'
+                </if>
+            </if>
+            <!--根据用户名查询-->
+            <if test="user!=null">
+                <if test="user.username!=null and user.username!=''">
+                    and u.username like '%${user.username}%'
+                </if>
+                <if test="user.realName!=null and user.realName!=''">
+                    and u.real_name like '%${user.realName}%'
+                </if>
+            </if>
+            <!--根据归还类型查询-->
+            <if test="backType!=null">
+                and lend.back_type=#{backType}
+            </if>
+        </where>
+        order by lend.id desc
+    </select>
+
+    <!--查询借阅历史-->
+    <select id="findLendRecordsByUserId" resultMap="LendRecordType">
+        SELECT *
+        from tbl_lend_record lend
+        left join tbl_book b on b.id = lend.book_id
+        left join tbl_user u on u.id = lend.user_id
+        <where>
+            <if test="userId!=null">and u.id=#{userId} </if>
+        </where>
+        order by lend.id desc
+    </select>
+</mapper>

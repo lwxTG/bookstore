@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>图书列表</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{../static/layuimini/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{../static/layuimini/css/public.css}" media="all">
+    <script th:src="@{../static/layuimini/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px" id="btn">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">用户名</label>
+                            <div class="layui-input-inline">
+                                <!--注意此处input标签里的id-->
+                                <input class="layui-input" name="username" id="username" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">姓名</label>
+                            <div class="layui-input-inline">
+                                <input class="layui-input" name="realName" id="realName" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">手机号码</label>
+                            <div class="layui-input-inline">
+                                <input class="layui-input" name="telephone" id="telephone" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">用户类别</label>
+                            <div class="layui-input-inline">
+                                <select id="userRole" name="userRole">
+                                    <option value="">请选择</option>
+                                    <option value="0">非贫困生</option>
+                                    <option value="1">贫困生</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="layui-inline">
+                            <!--注意此处button标签里的type属性-->
+                            <button type="button" class="layui-btn" lay-submit data-type="reload"
+                                    lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 注册 </button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除 </button>
+            </div>
+        </script>
+
+        <!--表单，查询出的数据在这里显示-->
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="update"> 修改 </a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete"> 删除 </a>
+            <a class="layui-btn layui-btn-xs layui-btn-warm data-count-add" lay-event="recharge"> 充值 </a>
+        </script>
+
+    </div>
+</div>
+<script th:src="@{../static/layuimini/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+
+        table.render({
+            elem: '#currentTableId',
+            url: 'userAll',//查询类型数据
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [ [
+                {type: "checkbox", width: 50, align: "center"},
+                {field: 'username', width: 100, title: '用户名', sort: true, align: "center"},
+                {field: 'realName', width: 80, title: '姓名', align: "center"},
+                {field: 'sex', width: 80, title: '性别', align: "center"},
+                {field: 'birthday', width: 120, title: '生日', sort: true, align: "center"},
+                {field: 'telephone', width: 120, title: '手机号码', align: "center"},
+                {field: 'email', width: 180, title: '邮箱', align: "center"},
+                {field: 'balance', width: 100, title: '余额', align: "center",templet:function (d){
+                    return d.balance+'元';
+                    }},
+                {field: 'borrowPoint', width: 80, title: '借阅点', align: "center"},
+                {
+                    field: 'userRole', width: 120, title: '用户类型', sort: true, align: "center", templet: function (d) {
+                        if (d.userRole==0){
+                            return "非贫困生";
+                        }else if(d.userRole==1){
+                            return  "贫困生";
+                        }
+                    }
+                },
+                {field: 'registerTime', width: 170, title: '注册时间', sort: true, align: "center"},
+                {field: 'updateTime', width: 170, title: '更新时间', sort: true, align: "center"},
+                {title: '操作', minWidth: 180, toolbar: '#currentTableBar', align: "center"}
+            ] ],
+            limits: [5, 10, 15, 20, 25, 50],
+            limit: 15,  <!--默认显示15条-->
+            page: true,
+            skin: 'line',
+            id: 'testReload'
+        });
+
+        var active = {
+            reload: function () {
+                let username = $('#username').val();
+                let telephone = $('#telephone').val();
+                let realName = $('#realName').val();
+                let userRole = $('#userRole').val();
+                console.log(username)
+                //执行重载
+                table.reload('testReload', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+
+                    }
+                    , where: {
+                        username: username,
+                        realName: realName,
+                        telephone: telephone,
+                        userRole: userRole
+                    }
+                }, 'data');
+            }
+        };
+
+        $('#btn .layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        /**
+         * tool操作栏监听事件
+         */
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'update') {  // 监听修改操作
+                var index = layer.open({
+                    title: '修改用户信息',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: '/userUpdate?id=' + data.id,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            } else if (obj.event === 'delete') {  // 监听删除操作
+                layer.confirm('确定是否删除', function (index) {
+                    //调用删除功能
+                    deleteBookByIds(data.id, index);
+                    layer.close(index);
+                });
+            } else if (obj.event === 'recharge') { //监听入库操作
+                var index = layer.open({
+                    title: '用户充值',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: '/userRecharge?id=' + data.id,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            }
+        });
+
+        //监听表格复选框选择
+        table.on('checkbox(currentTableFilter)', function (obj) {
+            console.log(obj)
+        });
+
+        /**
+         * 获取选中记录的id信息
+         */
+        function getCheckId(data) {
+            var arr = new Array();
+            for (var i = 0; i < data.length; i++) {
+                arr.push(data[i].id);
+            }
+            //拼接id,变成一个字符串
+            return arr.join(",");
+        };
+
+
+        /**
+         * 提交删除功能
+         */
+        function deleteBookByIds(ids, index) {
+            //向后台发送请求
+            $.ajax({
+                url: "deleteUser",
+                type: "POST",
+                data: {ids: ids},
+                success: function (result) {
+                    if (result.code == 0) {//如果成功
+                        layer.msg('删除成功', {
+                            icon: 6,
+                            time: 500
+                        }, function () {
+                            parent.window.location.reload();
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(iframeIndex);
+                        });
+                    } else {
+                        layer.msg("删除失败");
+                    }
+                }
+            })
+        };
+
+        /**
+         * toolbar栏监听事件
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {  // 监听添加操作
+                var index = layer.open({
+                    title: '用户注册',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: '/userRegister',
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            } else if (obj.event === 'delete') {
+                /*
+                  1、提示内容，必须删除大于0条
+                  2、获取要删除记录的id信息
+                  3、提交删除功能 ajax
+                */
+                //获取选中的记录信息
+                var checkStatus = table.checkStatus(obj.config.id);
+                var data = checkStatus.data;
+                if (data.length == 0) {//如果没有选中信息
+                    layer.msg("请选择要删除的记录信息");
+                } else {
+                    //获取记录信息的id集合,拼接的ids
+                    var ids = getCheckId(data);
+                    layer.confirm('确定是否删除', function (index) {
+                        //调用删除功能
+                        deleteBookByIds(ids, index);
+                        layer.close(index);
+                    });
+                }
+            }
+        });
+
+    });
+</script>
+</body>
+</html>

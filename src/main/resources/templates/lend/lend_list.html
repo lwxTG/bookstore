@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>图书借阅列表</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{../static/layuimini/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{../static/layuimini/css/public.css}" media="all">
+    <script th:src="@{../static/layuimini/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px" id="btn">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">图书名称</label>
+                            <div class="layui-input-inline">
+                                <!--注意此处input标签里的id-->
+                                <input class="layui-input" name="bookName" id="bookName" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">用户名</label>
+                            <div class="layui-input-inline">
+                                <!--注意此处input标签里的id-->
+                                <input class="layui-input" name="username" id="username" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">真实姓名</label>
+                            <div class="layui-input-inline">
+                                <!--注意此处input标签里的id-->
+                                <input class="layui-input" name="realName" id="realName" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">还书类型</label>
+                            <div class="layui-input-inline">
+                                <select id="backType" name="backType">
+                                    <option value="">请选择</option>
+                                    <option value="0">在借中</option>
+                                    <option value="1">正常还书</option>
+                                    <option value="2">延迟还书</option>
+                                    <option value="3">破损还书</option>
+                                    <option value="4">图书丢失</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="layui-inline">
+                            <!--注意此处button标签里的type属性-->
+                            <button type="button" class="layui-btn" lay-submit data-type="reload"
+                                    lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="lend"> 借书</button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>
+            </div>
+        </script>
+
+        <!--表单，查询出的数据在这里显示-->
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            {{#  if(d.backType == 0){ }}
+            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="back">还书</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+            {{#  } else { }}
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+            {{#  }}}
+        </script>
+
+    </div>
+</div>
+<script th:src="@{../static/layuimini/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            table = layui.table;
+
+
+        table.render({
+            elem: '#currentTableId',
+            url: 'lendRecordAll',//查询类型数据
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [ [
+                {type: "checkbox", width: 50, align: "center"},
+                {
+                    field: 'bookName', width: 100, title: '图书名称', align: "center", templet: function (d) {
+                        return d.book.bookName;
+                    }
+                },
+                {
+                    field: 'username', width: 100, title: '用户名', align: "center", templet: function (d) {
+                        return d.user.username;
+                    }
+                },
+                {
+                    field: 'realName', width: 150, title: '真实姓名', sort: true, align: "center", templet: function (d) {
+                        return d.user.realName;
+                    }
+                },
+                {
+                    field: 'backType', width: 150, title: '还书类型', sort: true, align: "center", templet: function (d) {
+                        if (d.backType == '0') {
+                            return '<span class="layui-badge layui-bg-green">在借中</span>'
+                        } else if (d.backType == '1') {
+                            return '<span class="layui-badge layui-bg-green">正常还书</span>'
+                        } else if (d.backType == '2') {
+                            return '<span class="layui-badge layui-bg-yellow">延迟还书</span>'
+                        } else if (d.backType == '3') {
+                            return '<span class="layui-badge layui-bg-gray">破损还书</span>'
+                        } else if (d.backType == '4'){
+                            return '<span class="layui-badge layui-bg-red">图书丢失</span>'
+                        }
+                    }
+                },
+                {field: 'lendTime', width: 200, title: '借书时间', sort: true, align: "center"},
+                {field: 'backTime', width: 200, title: '还书时间', sort: true, align: "center"},
+                {title: '操作', minWidth: 100, toolbar: '#currentTableBar', align: "center"}
+            ] ],
+            limits: [5, 10, 15, 20, 25, 50],
+            limit: 15,  <!--默认显示15条-->
+            page: true,
+            skin: 'line',
+            id: 'testReload'
+        });
+
+        var active = {
+            reload: function () {
+                let bookName = $('#bookName').val();
+                let username = $('#username').val();
+                let realName = $('#realName').val();
+                let backType = $('#backType').val()
+                console.log(bookName)
+                //执行重载
+                table.reload('testReload', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    , where: {
+                        bookName: bookName,
+                        username: username,
+                        realName: realName,
+                        backType: backType
+                    }
+                }, 'data');
+            }
+        };
+
+        $('#btn .layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        /**
+         * tool操作栏监听事件
+         */
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'back') {  // 监听还书操作
+                var index = layer.open({
+                    title: '图书返还',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['60%', '60%'],
+                    content: '/bookBack?id=' + data.id,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            } else if (obj.event === 'delete') {  // 监听删除操作
+                layer.confirm('确定是否删除', function (index) {
+                    //调用删除功能
+                    deleteLendRecordByIds(data.id, index);
+                    layer.close(index);
+                });
+            }
+        });
+
+        //监听表格复选框选择
+        table.on('checkbox(currentTableFilter)', function (obj) {
+            console.log(obj)
+        });
+
+        /**
+         * 获取选中记录的id信息
+         */
+        function getCheckId(data) {
+            var arr = new Array();
+            for (var i = 0; i < data.length; i++) {
+                arr.push(data[i].id);
+            }
+            //拼接id,变成一个字符串
+            return arr.join(",");
+        };
+
+
+        /**
+         * 提交删除功能
+         */
+        function deleteLendRecordByIds(ids, index) {
+            //向后台发送请求
+            $.ajax({
+                url: "deleteLendRecord",
+                type: "POST",
+                data: {ids: ids},
+                success: function (result) {
+                    if (result.code == 0) {//如果成功
+                        layer.msg('删除成功', {
+                            icon: 6,
+                            time: 500
+                        }, function () {
+                            parent.window.location.reload();
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(iframeIndex);
+                        });
+                    } else {
+                        layer.msg("删除失败");
+                    }
+                }
+            })
+        };
+
+        /**
+         * toolbar栏监听事件
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'lend') {  // 监听借书操作
+                var index = layer.open({
+                    title: '图书借阅页面',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: '/bookLendList',
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            } else if (obj.event === 'delete') {
+                /*
+                  1、提示内容，必须删除大于0条
+                  2、获取要删除记录的id信息
+                  3、提交删除功能 ajax
+                */
+                //获取选中的记录信息
+                var checkStatus = table.checkStatus(obj.config.id);
+                var data = checkStatus.data;
+                if (data.length == 0) {//如果没有选中信息
+                    layer.msg("请选择要删除的记录信息");
+                } else {
+                    //获取记录信息的id集合,拼接的ids
+                    var ids = getCheckId(data);
+                    layer.confirm('确定是否删除', function (index) {
+                        //调用删除功能
+                        deleteLendRecordByIds(ids, index);
+                        layer.close(index);
+                    });
+                }
+            }
+        });
+
+    });
+</script>
+</body>
+</html>

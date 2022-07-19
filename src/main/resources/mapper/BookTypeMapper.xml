@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lwx.mapper.BookTypeMapper">
+
+    <select id="findAllBookTypeInfo" resultType="com.lwx.entity.BookType">
+        SELECT * FROM tbl_book_type
+        <where>
+            <if test="bookType!=null">
+                and tbl_book_type.book_type like '%${bookType}%'
+            </if>
+        </where>
+    </select>
+
+</mapper>

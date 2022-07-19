@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{../static/layuimini/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{../static/layuimini/css/public.css}" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <input type="hidden" name="id" th:value="${user.id}">
+    <div class="layui-form layuimini-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">用户名</label>
+            <div class="layui-input-block">
+                <input type="text" name="username" lay-verify="required" readonly="readonly" th:value="${user.username}" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">真实姓名</label>
+            <div class="layui-input-block">
+                <input type="text" name="realName" lay-verify="required" readonly="readonly" th:value="${user.realName}" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item" pane>
+            <label class="layui-form-label required">性别</label>
+            <div class="layui-input-block">
+                <input type="radio" name="sex" value="男" title="男" th:checked="${user.sex} eq '男'" disabled>
+                <input type="radio" name="sex" value="女" title="女" th:checked="${user.sex} eq '女'" disabled>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">生日</label>
+            <div class="layui-input-block">
+                <input type="text" name="birthday" id="date" lay-verify="date"  readonly="readonly" autocomplete="off" th:value="${user.birthday}" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">手机号码</label>
+            <div class="layui-input-block">
+                <input type="text" name="telephone" lay-verify="phone"  readonly="readonly" th:value="${user.telephone}"class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">邮箱地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="email" lay-verify="email"  readonly="readonly" th:value="${user.email}" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">账户余额</label>
+            <div class="layui-input-block">
+                <input type="number" name="balance" lay-verify="required"  readonly="readonly" th:value="${user.balance}" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">借阅点</label>
+            <div class="layui-input-block">
+                <input type="number" name="borrowPoint" lay-verify="required"  readonly="readonly" th:value="${user.borrowPoint}" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">用户类型</label>
+            <div class="layui-input-block">
+                <select name="userRole" id="userRole" lay-verify="required" disabled>
+                    <option value="0" th:selected="${user.userRole} eq 0">非贫困生</option>
+                    <option value="1" th:selected="${user.userRole} eq 1">贫困生</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" id="updateInfo">修改基本信息</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{../static/layuimini/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script>
+    layui.use(['form'], function () {
+        let layer = layui.layer,
+            $ = layui.$;
+        $('#updateInfo').on("click", function () {
+            layer.open({
+                title: '个人基本信息更改',
+                type: 2,
+                shade: 0.2,
+                maxmin: true,
+                shadeClose: true,
+                area: ['100%', '100%'],
+                content: '/userInfoUpdate',
+            });
+        });
+    });
+</script>
+</body>
+</html>

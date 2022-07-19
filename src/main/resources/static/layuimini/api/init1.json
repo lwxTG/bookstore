@@ -1,0 +1,78 @@
+{
+  "homeInfo": {
+    "title": "首页",
+    "href": "bookListForUser"
+  },
+  "logoInfo": {
+    "title": "爱心书屋",
+    "image": "/static/layuimini/images/logo.png",
+    "href": ""
+  },
+  "menuInfo": [
+    {
+      "title": "书屋系统",
+      "icon": "fa fa-bars",
+      "href": "",
+      "target": "_self",
+      "child": [
+        {
+          "title": "图书信息",
+          "href": "bookListForUser",
+          "icon": "fa fa-book",
+          "target": "_self"
+        },
+        {
+          "title": "图书借阅历史",
+          "href": "borrowHistory",
+          "icon": "fa fa-bookmark",
+          "target": "_self"
+        },
+        {
+          "title": "图书预约信息",
+          "href": "orderHistory",
+          "icon": "fa fa-clock-o",
+          "target": "_self"
+        },
+        {
+          "title": "图书购买历史",
+          "href": "purchaseHistory",
+          "icon": "fa fa-cart-plus",
+          "target": "_self"
+        },
+        {
+          "title": "图书捐赠历史",
+          "href": "donateHistory",
+          "icon": "fa fa-thumbs-up",
+          "target": "_self"
+        },
+        {
+          "title": "用户充值历史",
+          "href": "rechargeHistory",
+          "icon": "fa fa-money",
+          "target": "_self"
+        },
+        {
+          "title": "个人信息",
+          "href": "",
+          "icon": "fa fa-user",
+          "target": "_self",
+          "child": [
+            {
+              "title": "基本信息",
+              "href": "userInfo",
+              "icon": "fa fa-pencil-square-o",
+              "target": "_self"
+            },
+            {
+              "title": "修改密码",
+              "href": "userUpdatePassword",
+              "icon": "fa fa-pencil-square-o",
+              "target": "_self"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

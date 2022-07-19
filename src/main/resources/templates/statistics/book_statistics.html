@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>图书分类数量统计</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{../static/layuimini/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{../static/layuimini/css/public.css}" media="all">
+    <script th:src="@{../static/layuimini/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+</head>
+<body>
+<!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+<div id="main1" style="width: 100%;height:400px;"></div>
+<hr class="layui-border-blue">
+<div id="main2" style="width: 100%;height:400px;"></div>
+<hr class="layui-border-blue">
+<div id="main3" style="width: 100%;height:400px;"></div>
+
+<script th:src="@{../static/layuimini/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:src="@{../static/layuimini/js/lay-config.js}" charset="utf-8"></script>
+<script th:inline="javascript">
+    layui.use(['echarts'], function () {
+        let $ = layui.jquery,
+            echarts = layui.echarts;
+
+        let donateBookNames = [[${donateBookNames}]];
+        let donateAmounts = [[${donateAmounts}]];
+        let purchaseBookNames = [[${purchaseBookNames}]];
+        let purchaseAmounts = [[${purchaseAmounts}]];
+        let lendBookNames = [[${lendBookNames}]];
+        let lendTimes = [[${lendTimes}]];
+
+        // 基于准备好的dom，初始化echarts实例
+        let myChart1 = echarts.init(document.getElementById('main1'));
+        let myChart2 = echarts.init(document.getElementById('main2'));
+        let myChart3 = echarts.init(document.getElementById('main3'));
+        //指定图表的配置项和数据
+        let option1 = {
+            title: {
+                text: '图书捐赠数据统计',
+                subtext:'近三十天数据',
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {},
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value',
+                boundaryGap: [0, 0.01],
+                minInterval : 1
+            },
+            yAxis: {
+                type: 'category',
+                data: donateBookNames
+            },
+            series: [
+                {
+                    name: '图书捐赠数量',
+                    type: 'bar',
+                    data: donateAmounts,
+                    itemStyle: {
+                        color:'#748ede'
+                    }
+                }
+            ]
+        };
+        let option2 = {
+            title: {
+                text: '图书购买数据统计',
+                subtext:'近三十天数据',
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {},
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value',
+                boundaryGap: [0, 0.01],
+                minInterval : 1
+            },
+            yAxis: {
+                type: 'category',
+                data: purchaseBookNames
+            },
+            series: [
+                {
+                    name: '图书购买数量',
+                    type: 'bar',
+                    data: purchaseAmounts,
+                    itemStyle: {
+                        color:'#f59b9b'
+                    }
+                }
+            ]
+        };
+        let option3 = {
+            title: {
+                text: '图书借阅数据统计',
+                subtext:'近三十天数据',
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {},
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value',
+                boundaryGap: [0, 0.01],
+                minInterval : 1
+            },
+            yAxis: {
+                type: 'category',
+                data: lendBookNames
+            },
+            series: [
+                {
+                    name: '图书借阅数量',
+                    type: 'bar',
+                    data: lendTimes,
+                    itemStyle: {
+                        color:'#a4e0f7'
+                    }
+                }
+            ]
+        };
+        // 使用刚指定的配置项和数据显示图表。
+        myChart1.setOption(option1);
+        myChart2.setOption(option2);
+        myChart3.setOption(option3);
+
+    });
+</script>
+</body>
+</html>
